@@ -45,6 +45,15 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    const getToken = async () => {
+        try {
+            const token = await magic.user.getIdToken()
+            return token
+        }catch (e) {
+            
+        }
+    }
+
     useEffect(() => {
         magic = new Magic(MAGIC_PUBLIC_KEY)
         checkUserLoggedIn()
