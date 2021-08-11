@@ -1,6 +1,7 @@
 import Image from "next/image";
 import {API_URL, fromImageToUrl} from "../../utils/urls";
 import Head from "next/head";
+import {twoDecimals} from "../../utils/format";
 
 
 
@@ -8,35 +9,53 @@ import Head from "next/head";
 const Product = ({product}) => {
     return (
         <div>
+
             <Head>
-                {product.meta_title && <title>{product.meta_title}</title>}
-                {product.meta_description && <meta name={'description'} content={product.meta_description}/>}
+                {product.meta_title &&
+                <title>{product.meta_title}</title>
+                }
+                {product.meta_description &&
+                <meta name="description"
+                      content={product.meta_description}
+                />
+                }
+
             </Head>
-           <h3>{product.name}</h3>
-            <Image src={fromImageToUrl(product.image)} width={400} height={400}/>
+
             <h3>{product.name}</h3>
-            <p>{product.price}</p>
-            <p>{product.content}</p>
+            <img src={fromImageToUrl(product.image)} />
+            <h3>{product.name}</h3>
+            {/*<BuyButton product={product} />*/}
+            <p>${twoDecimals(product.price)}</p>
+
+            <p>
+                {product.content}
+            </p>
         </div>
     )
 }
+
 export async function getStaticProps({params: {slug}}) {
-    const result = await fetch(`${API_URL}/products/?slug=${slug}`)
-    const found = await result.json()
+    const product_res = await fetch(`${API_URL}/products/?slug=${slug}`)
+    const found = await product_res.json()
+
     return {
         props: {
             product: found[0]
         }
     }
 }
-export default Product
+
 export async function getStaticPaths() {
-    const res = await fetch(`${API_URL}/products`)
-    const products = await res.json()
+    // Get external data from the file system, API, DB, etc.
+    const products_res = await fetch(`${API_URL}/products`)
+    const products = await products_res.json()
     return {
-        paths: products.map(product => ({
-            params: {slug: String(product.slug)}
+        paths: products.map(el => ({
+            params: {slug: String(el.slug)}
         })),
         fallback: false
-    }
+    };
 }
+
+export default Product
